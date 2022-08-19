@@ -2,7 +2,9 @@
 //  Home Page
 // by: Mika Senghaas
 import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+
+import httpClient from '../httpClient';
 
 // components
 import Tutorial from '../components/Tutorial';
@@ -10,12 +12,13 @@ import Controls from '../components/Controls';
 import Settings from '../components/Settings';
 import Display from '../components/Display';
 
-import { Box, Flex, Input, Heading, Text } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 
 const Home = ({ state, setState }) => {
   // ref to input field at start
   const input1 = useRef();
   const input2 = useRef();
+
 
   // forcefocus input fields
   useEffect(() => {
@@ -56,23 +59,40 @@ const Home = ({ state, setState }) => {
     return () => {
       document.removeEventListener('keydown', keyDownHandler);
     };
-  }, [state]);
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchName = state => {
-    const reqOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        country: state.country,
-        gender: state.gender,
-        startWith: state.startWith,
-        maxLen: state.maxLen,
-      }),
-    };
-    fetch(`http://jonasmika.pythonanywhere.com/sample`, reqOptions)
-      .then(res => res.text())
+    const body = {
+      countrycode: state.country,
+      gender: state.gender,
+      start_with: state.startWith,
+      max_len: state.maxLen,
+    }
+
+    httpClient.post('/name', body)
+      .then(res => res.data)
+      .then(name => {
+        clearMessage()
+        setState(prev => ({
+          ...prev,
+          names: [...prev.names, name],
+          curr: prev.names.length,
+          copied: false,
+        }));
+      })
+      .catch(err => {
+        setState(prev => ({
+          ...prev,
+          message: {
+            text: 'Sorry, something went wrong...',
+            color: 'red',
+          },
+        }));
+      })
+  }
+
+
+    /*
       .then(res => {
         clearMessage();
         const name = res.trim().replaceAll('"', '');
@@ -92,17 +112,9 @@ const Home = ({ state, setState }) => {
           },
         }));
       });
-  };
-
-  // input field for start with
-  const typeStartWith = e => {
-    if (e.target.value.length <= 5) {
-      setState(prev => ({
-        ...prev,
-        startWith: e.target.value,
-      }));
     }
   };
+      */
 
   // set curr pointer in names array
   const setCurr = i => {
@@ -168,11 +180,6 @@ const Home = ({ state, setState }) => {
     }));
   };
 
-  // display messages
-  const displayMessage = state => {
-    return <Text color={state.message.color}>{state.message.text}</Text>;
-  };
-
   // clear messages
   const clearMessage = () => {
     setMessage('', 'gray');
@@ -189,7 +196,7 @@ const Home = ({ state, setState }) => {
       justifyContent="center"
     >
       {state.names.length === 0 && state.startWith === '' ? (
-        <Tutorial setState={setState}/>
+        <Tutorial setState={setState} />
       ) : (
         <>
           <Display state={state} setState={setState} />

@@ -6,8 +6,8 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-  PopoverBody }
-from '@chakra-ui/react'
+  PopoverBody,
+} from '@chakra-ui/react';
 
 // icons
 import {
@@ -17,6 +17,7 @@ import {
   AiOutlineHeart,
   AiFillHeart,
 } from 'react-icons/ai';
+import httpClient from 'httpClient';
 
 const Controls = ({ state, setState }) => {
   // set curr pointer in names array
@@ -39,7 +40,6 @@ const Controls = ({ state, setState }) => {
   const clearMessage = () => {
     setMessage('', 'gray');
   };
-
 
   // set start with
   const setStartWith = s => {
@@ -75,13 +75,39 @@ const Controls = ({ state, setState }) => {
   };
 
   // (un)like current name
-  const rateName = state => {
+  const rateName = async state => {
     const res = state.liked;
     res[state.curr] = !res[state.curr];
+
     if (res[state.curr]) {
       setMessage('Liked!', 'red');
+      httpClient.post('/likes', {
+        like: true,
+        name: state.names[state.curr],
+        countrycode: state.country,
+        gender: state.gender,
+      })
+      .then(_ => console.log('Sucessfully added to liked'))
+      .catch(err => console.log('something went wrong'))
+
     } else {
-      setMessage('Unliked', 'gray');
+      const res = await httpClient.post('/likes', {
+        like: false,
+        name: state.names[state.curr],
+        countrycode: state.country,
+        gender: state.gender,
+      });
+
+      if (res.status === 200) {
+        setMessage('Unliked', 'gray');
+        httpClient.post('/likes', {
+          like: false,
+          name: state.names[state.curr],
+          countrycode: state.country,
+          gender: state.gender,
+        })
+        .then(_ => console.log('Sucessfully removed from liked'));
+      }
     }
     setState(prev => ({
       ...prev,

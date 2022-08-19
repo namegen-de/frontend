@@ -10,7 +10,6 @@ import {
   ListItem,
   Link,
 } from '@chakra-ui/react';
-import { Link as RouterLink } from 'react-router-dom';
 
 const H1 = ({ children }) => {
   return <Heading mb="1rem">{children}</Heading>;

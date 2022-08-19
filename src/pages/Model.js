@@ -1,41 +1,50 @@
-import React from 'react'
-import { useState, useEffect } from 'react'
-import { Flex, Heading, Text } from '@chakra-ui/react'
+import React from 'react';
+import { useState, useEffect } from 'react';
+import { Flex, Heading, Text } from '@chakra-ui/react';
 
-const H1 = ({ children }) => {
-  return <Heading mb="1rem">{children}</Heading>;
-};
-
-const H2 = ({ children }) => {
-  return (
-    <Heading mt="2rem" fontSize="16px" textTransform="uppercase">
-      {children}
-    </Heading>
-  );
-};
-
-const P = ({ children }) => {
-  return (
-    <Text fontSize="14px" my=".25rem" maxWidth="750px">
-      {children}
-    </Text>
-  );
-};
+import httpClient from '../httpClient';
 
 const Model = () => {
-  const [meta, setMeta] = useState({})
+  const [meta, setMeta] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   // on component re-render
   useEffect(() => {
-    fetchMeta(); // meta data about model
+    httpClient
+      .get('/meta')
+      .then(res => {
+        setMeta(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
+      });
   }, []);
 
-  const fetchMeta = () => {
-    fetch(`http://jonasmika.pythonanywhere.com/meta`)
-      .then(res => res.json())
-      .then(res => {
-        console.log(res)
-        setMeta(res)
-      });
+  const render = () => {
+    if (loading) {
+      return (
+        <Text color="gray" fontSize="10px">
+          Loading...
+        </Text>
+      );
+    } else {
+      if (error) {
+        return (
+          <Text color="gray" fontSize="10px">
+            {error}
+          </Text>
+        );
+      } else {
+        return (
+          <Text color="gray" fontSize="10px">
+            Model from {meta.general.time}
+          </Text>
+        );
+      }
+    }
   };
 
   return (
@@ -47,14 +56,10 @@ const Model = () => {
       direction="column"
       overflow="scroll"
     >
-      <H1>Model</H1>
-      {meta.general && 
-      <Text color="gray" fontSize="10px">
-        Model from {meta.general.time}
-      </Text>
-      }
+      <Heading mb='1rem'>Model</Heading>
+      {render()}
     </Flex>
-  )
-}
+  );
+};
 
-export default Model
+export default Model;

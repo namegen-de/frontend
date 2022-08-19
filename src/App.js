@@ -2,8 +2,7 @@
 // by: Mika Senghaas
 
 // default imports
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 // chakra
 import { theme, ChakraProvider, Flex } from '@chakra-ui/react';
@@ -16,10 +15,13 @@ import * as rdd from 'react-device-detect';
 import About from './pages/About';
 import Home from './pages/Home';
 import Leaderboard from './pages/Leaderboard';
+import LikedNames from './pages/LikedNames'
+import Login from './pages/Login'
 import Mobile from './pages/Mobile';
 import Model from './pages/Model';
 import NotFound from './pages/NotFound';
 import Privacy from './pages/Privacy';
+import Register from './pages/Register'
 import Terms from './pages/Terms';
 import User from './pages/User';
 
@@ -31,7 +33,7 @@ const App = () => {
   // state
   const [state, setState] = useState({
     // user primary key
-    user: '',
+    user: JSON.parse(localStorage.getItem('@me')) || null,
 
     // name and like history
     names: [],
@@ -51,14 +53,6 @@ const App = () => {
     message: { text: '', color: 'gray' },
   });
 
-  useEffect(() => {
-    console.log(state)
-  }, [state])
-
-  // backend url
-  const url = process.env.REACT_APP_BACKEND_URL;
-
-
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
@@ -71,19 +65,22 @@ const App = () => {
           alignItems="center"
           direction="column"
         >
-          <Header />
+          <Header state={state} setState={setState} />
           {rdd.isMobile ? (
             <Mobile />
           ) : (
             <>
               <Routes>
-                <Route path="/" element={<Home state={state} setState={setState}/>} />
+                <Route path="/" element={<Home state={state} setState={setState} />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/liked-names" element={<LikedNames />} />
                 <Route path="/model" element={<Model />} />
                 <Route path="/user" element={<User />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login setState={setState} />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Footer />

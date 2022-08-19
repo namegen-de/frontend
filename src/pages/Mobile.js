@@ -2,7 +2,7 @@
 //  Screen to show on mobile
 // by: Mika Senghaas
 import React from 'react'
-import { Box, Flex, Image, Heading, Text } from '@chakra-ui/react'
+import { Flex, Image, Heading, Text } from '@chakra-ui/react'
 
 const Mobile = () => {
   return (

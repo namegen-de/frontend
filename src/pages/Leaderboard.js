@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, Heading } from '@chakra-ui/react';
+import { Flex, Heading, Text } from '@chakra-ui/react';
 
 const Leaderboard = () => {
   return (
@@ -11,7 +11,10 @@ const Leaderboard = () => {
       direction="column"
       overflow="scroll"
     >
-      <Heading>Leaderboard</Heading>
+      <Heading mb="1rem">Leaderboard</Heading>
+      <Text fontSize="10px" color="gray" mb="2rem">
+        Not yet implemented.
+      </Text>
     </Flex>
   );
 };
